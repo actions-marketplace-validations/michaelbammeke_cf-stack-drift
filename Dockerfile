@@ -9,7 +9,7 @@ region = us-east-1'\
 
 COPY drift.sh /
 
+ENTRYPOINT ["/drift.sh"]
 
-CMD ["bash", "/drift.sh"]
-
+#CMD ["bash", "/drift.sh"]
 

@@ -8,12 +8,12 @@ inputs:
     description: 'AWS SECRET'
     required: true
   aws-session:  
-    description: 'AWS SESSION KEY'
+    description: 'AWS SESSION TOKEN'
     required: true
 runs:
   using: 'docker'
   image: 'Dockerfile'
-  args:
-    - ${{ inputs.aws-access-key-id }}
-    - ${{ inputs.aws-secret-access-key }}
-    - ${{ inputs.aws-session }}
+  env:
+    AWS_ACCESS_KEY_ID: ${{ inputs.aws-access-key-id }}
+    AWS_SECRET_ACCESS_KEY: ${{ inputs.aws-secret-access-key }}
+    AWS_SESSION_TOKEN: ${{ inputs.aws-session }}
