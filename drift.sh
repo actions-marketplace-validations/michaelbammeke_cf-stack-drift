@@ -2,9 +2,9 @@
 export ENV=dev
 export SUBSYSTEM=iam
 
-export AWS_ACCESS_KEY_ID=$aws-access-key-id
-export AWS_SECRET_ACCESS_KEY=$aws-secret-access-key
-export AWS_SESSION_TOKEN=$aws-session-token
+# export AWS_ACCESS_KEY_ID=$aws-access-key-id
+# export AWS_SECRET_ACCESS_KEY=$aws-secret-access-key
+# export AWS_SESSION_TOKEN=$aws-session-token
 
 DRIFTIDS=()
 #cat stacks-new | jq -r '.StackSummaries[].StackName' | grep $ENV-$SUBSYSTEM-subsystem | 
