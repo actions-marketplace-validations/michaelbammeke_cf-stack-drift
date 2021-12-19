@@ -1,0 +1,19 @@
+name: 'CF Drift Detector'
+description: 'Identify drift in aws cloudformation stacks'
+inputs:
+  aws-access-key-id: 
+    description: 'AWS ACCESS KEY'
+    required: true
+  aws-secret-access-key:  
+    description: 'AWS SECRET'
+    required: true
+  aws-session:  
+    description: 'AWS SESSION KEY'
+    required: true
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.aws-access-key-id }}
+    - ${{ inputs.aws-secret-access-key }}
+    - ${{ inputs.aws-session }}
