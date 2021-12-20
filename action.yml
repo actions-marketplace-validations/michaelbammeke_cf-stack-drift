@@ -1,6 +1,12 @@
 name: 'CF Drift Detector'
 description: 'Identify drift in aws cloudformation stacks'
 inputs:
+  env:  
+    description: 'ENVIRONMENT'
+    required: true
+  subsystem:  
+    description: 'SUB SYSTEM'
+    required: true
   aws-region:  
     description: 'AWS REGION'
     required: true
@@ -17,6 +23,8 @@ runs:
   using: 'docker'
   image: 'Dockerfile'
   env:
+    ENV: ${{ inputs.env }}
+    SUBSYSTEM: ${{ inputs.subsystem }}
     AWS_DEFAULT_REGION: ${{ inputs.aws-region }}
     AWS_ACCESS_KEY_ID: ${{ inputs.aws-access-key-id }}
     AWS_SECRET_ACCESS_KEY: ${{ inputs.aws-secret-access-key }}

@@ -1,29 +1,22 @@
 
-export ENV=dev
-export SUBSYSTEM=iam
-
-env
-
-# export AWS_ACCESS_KEY_ID=$aws-access-key-id
-# export AWS_SECRET_ACCESS_KEY=$aws-secret-access-key
-# export AWS_SESSION_TOKEN=$aws-session-token
 
 DRIFTIDS=()
-#cat stacks-new | jq -r '.StackSummaries[].StackName' | grep $ENV-$SUBSYSTEM-subsystem | 
+
 OLDIFS=$IFS
 IFS=' '
 
 aws cloudformation list-stacks --stack-status-filter CREATE_COMPLETE UPDATE_COMPLETE > stacks-new
-while read stack; do
-echo $stack
-thisID=`aws cloudformation detect-stack-drift --stack-name $stack | jq -r '.StackDriftDetectionId'`
-DRIFTIDS+=($thisID)
+if [ $? != 0 ]; then
+    exit 56
+fi
 
+while read stack; do
+    thisID=`aws cloudformation detect-stack-drift --stack-name $stack | jq -r '.StackDriftDetectionId'`
+    DRIFTIDS+=($thisID)
 done <<< $(cat stacks-new | jq -r '.StackSummaries[].StackName' | grep $ENV-$SUBSYSTEM)
 
 IFS=$OLDIFS
 
-#echo ${DRIFTIDS[@]}
 
 # Wait till all drift checks have completed
 statusComplete="false"
@@ -34,7 +27,6 @@ do
     for id in "${DRIFTIDS[@]}"
     do
         DRIFTSTATUS=`aws cloudformation describe-stack-drift-detection-status --stack-drift-detection-id $id | jq -r '.DetectionStatus'`
-        echo "$id ----> $DRIFTSTATUS"
 
         if [ $DRIFTSTATUS == "DETECTION_IN_PROGRESS" ]; then
           count=$(( $count + 1 ))
@@ -67,15 +59,20 @@ for stack in $(cat stacks-new | jq -r '.StackSummaries[].StackName' | grep $ENV-
     DRIFTRESULT=`aws cloudformation describe-stacks --stack-name $stack | jq -r '.Stacks[].DriftInformation.StackDriftStatus'`
     if [ $DRIFTRESULT != "IN_SYNC" ]; then
       driftcount=$(( $driftcount + 1 ))
-      printf "$stack: ${RED}\t\t$DRIFTRESULT ${NOCOLOR}\n\n"
+      printf "STACK NAME <========> $stack ${RED}\t\t$DRIFTRESULT ${NOCOLOR}\n\n"
       aws cloudformation  describe-stack-resource-drifts --stack-name $stack | jq -r '.StackResourceDrifts[] | select(.StackResourceDriftStatus != "IN_SYNC")'
+      printf "\n\n\n\n" 
     fi
 done
 
 if [ $driftcount > 0 ]; then
   exit 56
 else
+printf "\n\n\n\n"
+echo "##########################################"
+echo "NO DRIFTS DETECTED. ALL RESOURCES IN SYNC"
+echo "##########################################"
   exit 0
 fi
 
-#dev-iam-central-authentication-app
+
